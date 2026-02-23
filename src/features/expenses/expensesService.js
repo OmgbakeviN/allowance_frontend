@@ -32,3 +32,13 @@ export async function createExpense(payload) {
   })
   return data
 }
+
+export async function getStudentExpenses(studentId, params = {}) {
+  const { data } = await api.get(`/api/expenses/students/${studentId}/`, { params })
+  return data
+}
+
+export async function getStudentExpenseSummary(studentId, params = {}) {
+  const { data } = await api.get(`/api/expenses/students/${studentId}/summary/`, { params })
+  return data
+}
