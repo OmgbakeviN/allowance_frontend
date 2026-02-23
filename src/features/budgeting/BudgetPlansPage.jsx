@@ -110,10 +110,11 @@ export default function BudgetPlansPage() {
               </div>
             </CardContent>
 
-            <div className="p-4 pt-0 flex gap-2">
+            <div className="p-4 pt-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Button asChild variant="outline" className="w-full">
                 <Link to={`/app/student/budget-plans/${p.id}`}>View</Link>
               </Button>
+
               <Button
                 className="w-full"
                 disabled={p.status === "ACTIVE" || busyId === p.id}
