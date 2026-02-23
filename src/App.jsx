@@ -12,6 +12,9 @@ import AcceptInvitePage from "@/features/relationships/AcceptInvitePage"
 import MyParentPage from "@/features/relationships/MyParentPage"
 import ExpensesPage from "@/features/expenses/ExpensesPage"
 import CategoriesPage from "@/features/expenses/CategoriesPage"
+import StudentWalletPage from "@/features/wallet/StudentWalletPage"
+import BudgetPlansPage from "@/features/budgeting/BudgetPlansPage"
+import PlanDetailPage from "@/features/budgeting/PlanDetailPage"
 
 function RoleRedirect() {
   return <div className="p-6">Choisis un menu.</div>
@@ -35,8 +38,9 @@ export default function App() {
 
             <Route element={<RoleRoute allow={["STUDENT", "ADMIN"]} />}>
               <Route path="student/dashboard" element={<StudentDashboardPage />} />
-              <Route path="student/budget-plans" element={<Page title="Budget Plans (next)" />} />
-              <Route path="student/wallet" element={<Page title="Wallet (next)" />} />
+              <Route path="student/budget-plans" element={<BudgetPlansPage />} />
+              <Route path="student/budget-plans/:id" element={<PlanDetailPage />} />
+              <Route path="student/wallet" element={<StudentWalletPage />} />
               <Route path="student/expenses" element={<ExpensesPage />} />
               <Route path="student/categories" element={<CategoriesPage />} />
               <Route path="student/link-parent" element={<AcceptInvitePage />} />
