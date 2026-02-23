@@ -9,3 +9,8 @@ export async function getStudentWalletTransactions(studentId) {
   const { data } = await api.get(`/api/wallet/students/${studentId}/transactions/`)
   return data
 }
+
+export async function createDeposit(payload) {
+  const { data } = await api.post("/api/wallet/deposits/", payload)
+  return data
+}

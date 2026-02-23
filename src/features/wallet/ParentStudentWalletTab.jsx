@@ -15,7 +15,7 @@ function fmt(dt) {
   return Number.isNaN(d.getTime()) ? dt : d.toLocaleString("fr-FR")
 }
 
-export default function ParentStudentWalletTab({ studentId }) {
+export default function ParentStudentWalletTab({ studentId, refreshKey = 0 }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [wallet, setWallet] = useState(null)
@@ -50,7 +50,7 @@ export default function ParentStudentWalletTab({ studentId }) {
     return () => {
       mounted = false
     }
-  }, [studentId])
+  }, [studentId, refreshKey])
 
   if (loading) return <Skeleton className="h-40 w-full" />
 

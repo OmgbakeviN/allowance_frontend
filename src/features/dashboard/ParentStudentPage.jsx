@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom"
 import { getParentStudentDashboard } from "@/features/dashboard/dashboardService"
 import ParentStudentExpensesTab from "@/features/expenses/ParentStudentExpensesTab"
 import ParentStudentWalletTab from "@/features/wallet/ParentStudentWalletTab"
+import DepositDialog from "@/features/wallet/DepositDialog"
 import ParentStudentActivePlanTab from "@/features/budgeting/ParentStudentActivePlanTab"
 import { money } from "@/lib/format"
 
@@ -127,25 +128,28 @@ export default function ParentStudentPage() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [WalletRefreshKey, setWalletRefreshKey] = useState(0)
+
+  const reloadWallet = () => setWalletRefreshKey((v) => v + 1)
 
   useEffect(() => {
     let mounted = true
-    ;(async () => {
-      setLoading(true)
-      setError("")
-      try {
-        const res = await getParentStudentDashboard(id)
-        if (mounted) setData(res)
-      } catch (e) {
-        setError(e?.response?.data?.detail || "Failed to load student dashboard.")
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    })()
+      ; (async () => {
+        setLoading(true)
+        setError("")
+        try {
+          const res = await getParentStudentDashboard(id)
+          if (mounted) setData(res)
+        } catch (e) {
+          setError(e?.response?.data?.detail || "Failed to load student dashboard.")
+        } finally {
+          if (mounted) setLoading(false)
+        }
+      })()
     return () => {
       mounted = false
     }
-  }, [id])
+  }, [id, WalletRefreshKey])
 
   if (loading) return <Skeleton className="h-40 w-full" />
 
@@ -166,6 +170,17 @@ export default function ParentStudentPage() {
     <div className="space-y-4">
       <Card>
         <CardHeader>
+          <div className="flex items-center gap-2">
+            <DepositDialog
+              studentId={id}
+              currency={currency}
+              onDeposited={() => {
+                setWalletRefreshKey((k) => k + 1)
+                // reload le dashboard parent student (sent_this_month, repartition, etc.)
+                // appelle ta fonction load()
+              }}
+            />
+          </div>
           <CardTitle className="flex items-center justify-between gap-2">
             <span className="truncate">{data.student.username}</span>
             <Badge variant="outline">{money(data.sent_this_month, currency)}</Badge>
@@ -189,11 +204,11 @@ export default function ParentStudentPage() {
         <TabsContent value="expenses" className="mt-4">
           <ParentStudentExpensesTab studentId={id} currency={currency} />
         </TabsContent>
-        
+
         <TabsContent value="wallet" className="mt-4">
-          <ParentStudentWalletTab studentId={id} />
+          <ParentStudentWalletTab studentId={id} refreshKey={WalletRefreshKey} />
         </TabsContent>
-        
+
         <TabsContent value="plan" className="mt-4">
           <ParentStudentActivePlanTab studentId={id} />
         </TabsContent>
