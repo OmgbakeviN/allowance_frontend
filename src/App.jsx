@@ -15,6 +15,7 @@ import CategoriesPage from "@/features/expenses/CategoriesPage"
 import StudentWalletPage from "@/features/wallet/StudentWalletPage"
 import BudgetPlansPage from "@/features/budgeting/BudgetPlansPage"
 import PlanDetailPage from "@/features/budgeting/PlanDetailPage"
+import RegisterPage from "./pages/RegisterPage"
 
 function RoleRedirect() {
   return <div className="p-6">Choisis un menu.</div>
@@ -29,7 +30,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<Page title="Register (next)" />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppLayout />}>

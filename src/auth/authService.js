@@ -12,3 +12,8 @@ export async function fetchMe() {
   const { data } = await api.get(ENDPOINTS.me)
   return data
 }
+
+export async function registerRequest(payload) {
+  const { data } = await api.post("api/auth/register/", payload)
+  return data
+}
