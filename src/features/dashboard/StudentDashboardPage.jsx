@@ -6,17 +6,55 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  AlertTriangle,
+  CircleDollarSign,
+  Flame,
+  PiggyBank,
+  Receipt,
+  Target,
+  TrendingUp,
+  Wallet,
+} from "lucide-react"
 
 function Alerts({ alerts = [] }) {
-  if (!alerts?.length) return <div className="text-sm text-muted-foreground">No alerts</div>
+  if (!alerts?.length) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+        <AlertTriangle className="h-4 w-4" />
+        <span>No alerts</span>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-wrap gap-2">
       {alerts.map((a, idx) => (
-        <Badge key={idx} variant="secondary">
+        <Badge key={idx} variant="secondary" className="gap-1 rounded-full px-3 py-1">
+          <AlertTriangle className="h-3.5 w-3.5" />
           {a.type}
         </Badge>
       ))}
     </div>
+  )
+}
+
+function StatCard({ icon: Icon, title, description, value }) {
+  return (
+    <Card className="overflow-hidden border shadow-sm">
+      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
+        <div className="space-y-1">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          <CardDescription className="text-xs">{description}</CardDescription>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#34E3CC]/20 via-[#4F9DFF]/20 to-[#7C5ADE]/20">
+          <Icon className="h-5 w-5 text-foreground" />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-semibold tracking-tight">{value}</div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -48,9 +86,9 @@ export default function StudentDashboardPage() {
     return (
       <div className="space-y-4">
         <Skeleton className="h-10 w-56" />
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 w-full" />
+            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
           ))}
         </div>
       </div>
@@ -69,81 +107,81 @@ export default function StudentDashboardPage() {
   }
 
   const currency = data?.wallet?.currency || "XAF"
-
   const daily = data.wallet?.buckets?.DAILY
   const spentToday = data.spending?.spent_today
   const remainingToday = data.spending?.daily_remaining_today
   const recommended = data.projection?.recommended_daily_spend
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Student Dashboard</CardTitle>
-          <CardDescription>Key stats & projection</CardDescription>
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-xl">Student Dashboard</CardTitle>
+            <CardDescription>Your daily budget at a glance</CardDescription>
+          </div>
+          <Badge variant="outline" className="w-fit rounded-full px-3 py-1">
+            {currency}
+          </Badge>
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Daily balance</CardTitle>
-            <CardDescription>DAILY bucket</CardDescription>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold">{money(daily, currency)}</CardContent>
-        </Card>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <StatCard
+          icon={Wallet}
+          title="Daily balance"
+          description="Available in DAILY"
+          value={money(daily, currency)}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Spent today</CardTitle>
-            <CardDescription>From DAILY</CardDescription>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold">{money(spentToday, currency)}</CardContent>
-        </Card>
+        <StatCard
+          icon={Receipt}
+          title="Spent today"
+          description="Used from DAILY"
+          value={money(spentToday, currency)}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Remaining today</CardTitle>
-            <CardDescription>Daily limit</CardDescription>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold">
-            {remainingToday ? money(remainingToday, currency) : "-"}
-          </CardContent>
-        </Card>
+        <StatCard
+          icon={CircleDollarSign}
+          title="Remaining today"
+          description="What is left for today"
+          value={remainingToday ? money(remainingToday, currency) : "-"}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Recommended / day</CardTitle>
-            <CardDescription>To finish the month</CardDescription>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold">{money(recommended, currency)}</CardContent>
-        </Card>
+        <StatCard
+          icon={Target}
+          title="Recommended / day"
+          description="To finish the month well"
+          value={money(recommended, currency)}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Avg daily spend (7d)</CardTitle>
-            <CardDescription>Burn rate</CardDescription>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold">{money(data.projection?.avg_daily_spend_7d, currency)}</CardContent>
-        </Card>
+        <StatCard
+          icon={TrendingUp}
+          title="Avg daily spend"
+          description="Last 7 days"
+          value={money(data.projection?.avg_daily_spend_7d, currency)}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Est. days until empty</CardTitle>
-            <CardDescription>DAILY bucket</CardDescription>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold">
-            {data.projection?.estimated_days_until_daily_empty ?? "-"}
-          </CardContent>
-        </Card>
+        <StatCard
+          icon={Flame}
+          title="Days until empty"
+          description="Estimated DAILY duration"
+          value={data.projection?.estimated_days_until_daily_empty ?? "-"}
+        />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top categories</CardTitle>
-            <CardDescription>By total amount</CardDescription>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <PiggyBank className="h-5 w-5" />
+                Top categories
+              </CardTitle>
+              <CardDescription>Highest expense categories</CardDescription>
+            </div>
           </CardHeader>
+
           <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -155,7 +193,7 @@ export default function StudentDashboardPage() {
               <TableBody>
                 {(data.top_categories || []).map((c, idx) => (
                   <TableRow key={idx}>
-                    <TableCell>{c["category__name"]}</TableCell>
+                    <TableCell className="font-medium">{c["category__name"]}</TableCell>
                     <TableCell className="text-right">{money(c.total, currency)}</TableCell>
                   </TableRow>
                 ))}
@@ -171,10 +209,13 @@ export default function StudentDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Alerts</CardTitle>
-            <CardDescription>Notifications</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Alerts
+            </CardTitle>
+            <CardDescription>Important budget notifications</CardDescription>
           </CardHeader>
           <CardContent>
             <Alerts alerts={data.alerts} />

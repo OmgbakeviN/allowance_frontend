@@ -13,16 +13,45 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  AlertTriangle,
+  LayoutDashboard,
+  PiggyBank,
+  Receipt,
+  User,
+  Wallet,
+} from "lucide-react"
 
 function Alerts({ alerts = [] }) {
-  if (!alerts?.length) return <div className="text-sm text-muted-foreground">No alerts</div>
+  if (!alerts?.length) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+        <AlertTriangle className="h-4 w-4" />
+        <span>No alerts</span>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-wrap gap-2">
       {alerts.map((a, idx) => (
-        <Badge key={idx} variant="secondary">
+        <Badge key={idx} variant="secondary" className="gap-1 rounded-full px-3 py-1">
+          <AlertTriangle className="h-3.5 w-3.5" />
           {a.type}
         </Badge>
       ))}
+    </div>
+  )
+}
+
+function MiniStat({ icon: Icon, label, value }) {
+  return (
+    <div className="rounded-2xl border p-4 shadow-sm">
+      <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+        <Icon className="h-4 w-4" />
+        <span>{label}</span>
+      </div>
+      <div className="text-lg font-semibold">{value}</div>
     </div>
   )
 }
@@ -32,55 +61,72 @@ function DashboardTab({ data }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Wallet</CardTitle>
-            <CardDescription>Balances</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Wallet className="h-5 w-5" />
+              Wallet
+            </CardTitle>
+            <CardDescription>Bucket balances</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">DAILY</span>
-              <span className="font-medium">{money(data.wallet?.buckets?.DAILY, currency)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">SAVINGS</span>
-              <span className="font-medium">{money(data.wallet?.buckets?.SAVINGS, currency)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">BILLS</span>
-              <span className="font-medium">{money(data.wallet?.buckets?.BILLS, currency)}</span>
-            </div>
+          <CardContent className="grid gap-3 text-sm">
+            <MiniStat
+              icon={Wallet}
+              label="DAILY"
+              value={money(data.wallet?.buckets?.DAILY, currency)}
+            />
+            <MiniStat
+              icon={PiggyBank}
+              label="SAVINGS"
+              value={money(data.wallet?.buckets?.SAVINGS, currency)}
+            />
+            <MiniStat
+              icon={Receipt}
+              label="BILLS"
+              value={money(data.wallet?.buckets?.BILLS, currency)}
+            />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Spending</CardTitle>
-            <CardDescription>Today & month</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Receipt className="h-5 w-5" />
+              Spending
+            </CardTitle>
+            <CardDescription>Today and this month</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Spent today</span>
-              <span className="font-medium">{money(data.spending?.spent_today, currency)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Remaining today</span>
-              <span className="font-medium">
-                {data.spending?.daily_remaining_today ? money(data.spending.daily_remaining_today, currency) : "-"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Month expenses</span>
-              <span className="font-medium">{money(data.spending?.total_month_expenses, currency)}</span>
-            </div>
+          <CardContent className="grid gap-3 text-sm">
+            <MiniStat
+              icon={Receipt}
+              label="Spent today"
+              value={money(data.spending?.spent_today, currency)}
+            />
+            <MiniStat
+              icon={Wallet}
+              label="Remaining today"
+              value={
+                data.spending?.daily_remaining_today
+                  ? money(data.spending.daily_remaining_today, currency)
+                  : "-"
+              }
+            />
+            <MiniStat
+              icon={PiggyBank}
+              label="Month expenses"
+              value={money(data.spending?.total_month_expenses, currency)}
+            />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Alerts</CardTitle>
-            <CardDescription>Status</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Alerts
+            </CardTitle>
+            <CardDescription>Student status</CardDescription>
           </CardHeader>
           <CardContent>
             <Alerts alerts={data.alerts} />
@@ -88,11 +134,15 @@ function DashboardTab({ data }) {
         </Card>
       </div>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Repartition this month</CardTitle>
-          <CardDescription>Deposits allocation (BILLS / SAVINGS / DAILY)</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <PiggyBank className="h-5 w-5" />
+            Repartition this month
+          </CardTitle>
+          <CardDescription>Deposits allocation by bucket</CardDescription>
         </CardHeader>
+
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -104,7 +154,7 @@ function DashboardTab({ data }) {
             <TableBody>
               {(data.repartition_this_month || []).map((r, idx) => (
                 <TableRow key={idx}>
-                  <TableCell>{r.bucket_type}</TableCell>
+                  <TableCell className="font-medium">{r.bucket_type}</TableCell>
                   <TableCell className="text-right">{money(r.total, currency)}</TableCell>
                 </TableRow>
               ))}
@@ -128,30 +178,28 @@ export default function ParentStudentPage() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [WalletRefreshKey, setWalletRefreshKey] = useState(0)
-
-  const reloadWallet = () => setWalletRefreshKey((v) => v + 1)
+  const [walletRefreshKey, setWalletRefreshKey] = useState(0)
 
   useEffect(() => {
     let mounted = true
-      ; (async () => {
-        setLoading(true)
-        setError("")
-        try {
-          const res = await getParentStudentDashboard(id)
-          if (mounted) setData(res)
-        } catch (e) {
-          setError(e?.response?.data?.detail || "Failed to load student dashboard.")
-        } finally {
-          if (mounted) setLoading(false)
-        }
-      })()
+    ;(async () => {
+      setLoading(true)
+      setError("")
+      try {
+        const res = await getParentStudentDashboard(id)
+        if (mounted) setData(res)
+      } catch (e) {
+        setError(e?.response?.data?.detail || "Failed to load student dashboard.")
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    })()
     return () => {
       mounted = false
     }
-  }, [id, WalletRefreshKey])
+  }, [id, walletRefreshKey])
 
-  if (loading) return <Skeleton className="h-40 w-full" />
+  if (loading) return <Skeleton className="h-40 w-full rounded-2xl" />
 
   if (error) {
     return (
@@ -167,34 +215,53 @@ export default function ParentStudentPage() {
   const currency = data?.wallet?.currency || "XAF"
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <DepositDialog
-              studentId={id}
-              currency={currency}
-              onDeposited={() => {
-                setWalletRefreshKey((k) => k + 1)
-                // reload le dashboard parent student (sent_this_month, repartition, etc.)
-                // appelle ta fonction load()
-              }}
-            />
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
+        <CardHeader className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <User className="h-5 w-5" />
+                <span className="truncate">{data.student.username}</span>
+              </CardTitle>
+              <CardDescription className="truncate">{data.student.email}</CardDescription>
+            </div>
+
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <Badge variant="outline" className="rounded-full px-3 py-1">
+                {money(data.sent_this_month, currency)}
+              </Badge>
+
+              <DepositDialog
+                studentId={id}
+                currency={currency}
+                onDeposited={() => {
+                  setWalletRefreshKey((k) => k + 1)
+                }}
+              />
+            </div>
           </div>
-          <CardTitle className="flex items-center justify-between gap-2">
-            <span className="truncate">{data.student.username}</span>
-            <Badge variant="outline">{money(data.sent_this_month, currency)}</Badge>
-          </CardTitle>
-          <CardDescription className="truncate">{data.student.email}</CardDescription>
         </CardHeader>
       </Card>
 
       <Tabs defaultValue="dashboard" className="w-full">
-        <TabsList className="w-full justify-start flex-wrap">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          <TabsTrigger value="wallet">Wallet</TabsTrigger>
-          <TabsTrigger value="plan">Active plan</TabsTrigger>
+        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-2xl bg-muted/60 p-1">
+          <TabsTrigger value="dashboard" className="gap-2 rounded-xl">
+            <LayoutDashboard className="h-4 w-4" />
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="expenses" className="gap-2 rounded-xl">
+            <Receipt className="h-4 w-4" />
+            Expenses
+          </TabsTrigger>
+          <TabsTrigger value="wallet" className="gap-2 rounded-xl">
+            <Wallet className="h-4 w-4" />
+            Wallet
+          </TabsTrigger>
+          <TabsTrigger value="plan" className="gap-2 rounded-xl">
+            <PiggyBank className="h-4 w-4" />
+            Active plan
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="dashboard" className="mt-4">
@@ -206,7 +273,7 @@ export default function ParentStudentPage() {
         </TabsContent>
 
         <TabsContent value="wallet" className="mt-4">
-          <ParentStudentWalletTab studentId={id} refreshKey={WalletRefreshKey} />
+          <ParentStudentWalletTab studentId={id} refreshKey={walletRefreshKey} />
         </TabsContent>
 
         <TabsContent value="plan" className="mt-4">
