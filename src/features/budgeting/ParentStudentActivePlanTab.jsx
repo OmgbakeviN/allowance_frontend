@@ -7,6 +7,30 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  BadgePercent,
+  CalendarDays,
+  CircleDollarSign,
+  FileText,
+  PiggyBank,
+  Receipt,
+  Wallet,
+} from "lucide-react"
+
+function StatCard({ icon: Icon, title, value, subtitle }) {
+  return (
+    <div className="rounded-2xl border bg-background p-4 shadow-sm">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm font-medium text-muted-foreground">{title}</div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#34E3CC]/20 via-[#4F9DFF]/20 to-[#7C5ADE]/20">
+          <Icon className="h-5 w-5 text-foreground" />
+        </div>
+      </div>
+      <div className="text-lg font-semibold">{value}</div>
+      {subtitle ? <div className="mt-1 text-xs text-muted-foreground">{subtitle}</div> : null}
+    </div>
+  )
+}
 
 export default function ParentStudentActivePlanTab({ studentId }) {
   const [loading, setLoading] = useState(true)
@@ -52,11 +76,11 @@ export default function ParentStudentActivePlanTab({ studentId }) {
       ? `${plan?.savings_percent || 0}%`
       : "-"
 
-  if (loading) return <Skeleton className="h-40 w-full" />
+  if (loading) return <Skeleton className="h-40 w-full rounded-2xl" />
 
   if (error) {
     return (
-      <Alert>
+      <Alert className="rounded-2xl">
         <AlertDescription className="text-destructive">{error}</AlertDescription>
       </Alert>
     )
@@ -64,10 +88,15 @@ export default function ParentStudentActivePlanTab({ studentId }) {
 
   if (notFound) {
     return (
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Active plan</CardTitle>
-          <CardDescription className="text-muted-foreground">Student has no active plan.</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Active plan
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Student has no active plan.
+          </CardDescription>
         </CardHeader>
       </Card>
     )
@@ -75,39 +104,58 @@ export default function ParentStudentActivePlanTab({ studentId }) {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Active plan</CardTitle>
-          <CardDescription>{plan?.name}</CardDescription>
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <FileText className="h-5 w-5" />
+              Active plan
+            </CardTitle>
+            <CardDescription className="truncate">{plan?.name}</CardDescription>
+          </div>
+
+          <Badge variant="outline" className="w-fit rounded-full px-3 py-1">
+            {currency}
+          </Badge>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-          <div className="rounded-md border p-3">
-            <div className="text-muted-foreground">Currency</div>
-            <div className="font-semibold">{currency}</div>
-          </div>
-          <div className="rounded-md border p-3">
-            <div className="text-muted-foreground">Daily limit</div>
-            <div className="font-semibold">{money(plan?.daily_limit, currency)}</div>
-          </div>
-          <div className="rounded-md border p-3">
-            <div className="text-muted-foreground">Savings</div>
-            <div className="font-semibold">
-              <Badge variant="secondary">{plan?.savings_mode}</Badge>
-              <span className="ml-2">{savingsLabel}</span>
-            </div>
-          </div>
-          <div className="rounded-md border p-3 md:col-span-3">
-            <div className="text-muted-foreground">Total bills</div>
-            <div className="text-xl font-semibold">{totalBills}</div>
-          </div>
-        </CardContent>
       </Card>
 
-      <Card>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          icon={CircleDollarSign}
+          title="Currency"
+          value={currency}
+          subtitle="Plan currency"
+        />
+        <StatCard
+          icon={Wallet}
+          title="Daily limit"
+          value={money(plan?.daily_limit, currency)}
+          subtitle="Daily spending cap"
+        />
+        <StatCard
+          icon={PiggyBank}
+          title="Savings"
+          value={savingsLabel}
+          subtitle={plan?.savings_mode || "NONE"}
+        />
+        <StatCard
+          icon={Receipt}
+          title="Total bills"
+          value={totalBills}
+          subtitle={`${bills.length} fixed charge(s)`}
+        />
+      </div>
+
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Bills</CardTitle>
-          <CardDescription>Fixed charges (priority order)</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Receipt className="h-5 w-5" />
+            Bills
+          </CardTitle>
+          <CardDescription>Fixed charges by priority order</CardDescription>
         </CardHeader>
+
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -119,14 +167,30 @@ export default function ParentStudentActivePlanTab({ studentId }) {
                 <TableHead className="text-right">Amount</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {bills.map((b) => (
                 <TableRow key={b.id}>
-                  <TableCell className="font-medium">{b.title}</TableCell>
-                  <TableCell>{b.priority}</TableCell>
-                  <TableCell className="text-muted-foreground">{b.due_day ?? "-"}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <Receipt className="h-4 w-4 text-muted-foreground" />
+                      <span>{b.title}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
-                    <Badge variant={b.is_mandatory ? "default" : "secondary"}>
+                    <div className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs">
+                      <BadgePercent className="h-3.5 w-3.5" />
+                      {b.priority}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    <div className="inline-flex items-center gap-1">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      {b.due_day ?? "-"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={b.is_mandatory ? "default" : "secondary"} className="rounded-full">
                       {b.is_mandatory ? "Yes" : "No"}
                     </Badge>
                   </TableCell>

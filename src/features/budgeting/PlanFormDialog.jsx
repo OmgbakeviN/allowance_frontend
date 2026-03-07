@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { CircleDollarSign, PiggyBank, Save, Settings2, Wallet } from "lucide-react"
 
 const SAVINGS_MODES = ["NONE", "AMOUNT", "PERCENT"]
 
@@ -91,42 +92,71 @@ export default function PlanFormDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={triggerVariant}>{triggerLabel}</Button>
+        <Button variant={triggerVariant} className="gap-2 rounded-xl">
+          <Settings2 className="h-4 w-4" />
+          {triggerLabel}
+        </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg rounded-2xl">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Wallet className="h-5 w-5" />
+            {title}
+          </DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         {error ? (
-          <Alert>
+          <Alert className="rounded-2xl">
             <AlertDescription className="text-destructive">{error}</AlertDescription>
           </Alert>
         ) : null}
 
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} required />
+            <Label className="flex items-center gap-2">
+              <Wallet className="h-4 w-4 text-muted-foreground" />
+              Name
+            </Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} required className="rounded-xl" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Currency</Label>
-              <Input value={currency} onChange={(e) => setCurrency(e.target.value)} placeholder="XAF" />
+              <Label className="flex items-center gap-2">
+                <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+                Currency
+              </Label>
+              <Input
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                placeholder="XAF"
+                className="rounded-xl"
+              />
             </div>
+
             <div className="space-y-2">
-              <Label>Daily limit (0 = no limit)</Label>
-              <Input value={dailyLimit} onChange={(e) => setDailyLimit(e.target.value)} placeholder="2000" />
+              <Label className="flex items-center gap-2">
+                <Wallet className="h-4 w-4 text-muted-foreground" />
+                Daily limit
+              </Label>
+              <Input
+                value={dailyLimit}
+                onChange={(e) => setDailyLimit(e.target.value)}
+                placeholder="2000"
+                className="rounded-xl"
+              />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Savings mode</Label>
+            <Label className="flex items-center gap-2">
+              <PiggyBank className="h-4 w-4 text-muted-foreground" />
+              Savings mode
+            </Label>
             <Select value={savingsMode} onValueChange={setSavingsMode}>
-              <SelectTrigger>
+              <SelectTrigger className="rounded-xl">
                 <SelectValue placeholder="Select mode" />
               </SelectTrigger>
               <SelectContent>
@@ -141,23 +171,40 @@ export default function PlanFormDialog({
 
           {savingsMode === "AMOUNT" ? (
             <div className="space-y-2">
-              <Label>Savings amount</Label>
-              <Input value={savingsAmount} onChange={(e) => setSavingsAmount(e.target.value)} placeholder="15000" />
+              <Label className="flex items-center gap-2">
+                <PiggyBank className="h-4 w-4 text-muted-foreground" />
+                Savings amount
+              </Label>
+              <Input
+                value={savingsAmount}
+                onChange={(e) => setSavingsAmount(e.target.value)}
+                placeholder="15000"
+                className="rounded-xl"
+              />
             </div>
           ) : null}
 
           {savingsMode === "PERCENT" ? (
             <div className="space-y-2">
-              <Label>Savings percent (0-100)</Label>
-              <Input value={savingsPercent} onChange={(e) => setSavingsPercent(e.target.value)} placeholder="10" />
+              <Label className="flex items-center gap-2">
+                <PiggyBank className="h-4 w-4 text-muted-foreground" />
+                Savings percent
+              </Label>
+              <Input
+                value={savingsPercent}
+                onChange={(e) => setSavingsPercent(e.target.value)}
+                placeholder="10"
+                className="rounded-xl"
+              />
             </div>
           ) : null}
 
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="secondary" onClick={() => setOpen(false)} className="rounded-xl">
               Cancel
             </Button>
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving} className="gap-2 rounded-xl">
+              <Save className="h-4 w-4" />
               {saving ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>

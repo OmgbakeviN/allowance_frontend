@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { BadgePercent, CalendarDays, Receipt, Save } from "lucide-react"
 
 export default function BillFormDialog({
   triggerLabel,
@@ -75,49 +76,92 @@ export default function BillFormDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={triggerVariant}>{triggerLabel}</Button>
+        <Button variant={triggerVariant} className="gap-2 rounded-xl">
+          <Receipt className="h-4 w-4" />
+          {triggerLabel}
+        </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg rounded-2xl">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Receipt className="h-5 w-5" />
+            {title}
+          </DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         {error ? (
-          <Alert>
+          <Alert className="rounded-2xl">
             <AlertDescription className="text-destructive">{error}</AlertDescription>
           </Alert>
         ) : null}
 
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Title</Label>
-            <Input value={billTitle} onChange={(e) => setBillTitle(e.target.value)} placeholder="Rent" required />
+            <Label className="flex items-center gap-2">
+              <Receipt className="h-4 w-4 text-muted-foreground" />
+              Title
+            </Label>
+            <Input
+              value={billTitle}
+              onChange={(e) => setBillTitle(e.target.value)}
+              placeholder="Rent"
+              required
+              className="rounded-xl"
+            />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Amount</Label>
-              <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="30000" required />
+              <Label className="flex items-center gap-2">
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+                Amount
+              </Label>
+              <Input
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="30000"
+                required
+                className="rounded-xl"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label>Due day (1-31, optional)</Label>
-              <Input value={dueDay} onChange={(e) => setDueDay(e.target.value)} placeholder="5" />
+              <Label className="flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                Due day
+              </Label>
+              <Input
+                value={dueDay}
+                onChange={(e) => setDueDay(e.target.value)}
+                placeholder="5"
+                className="rounded-xl"
+              />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Priority (1 = first)</Label>
-              <Input value={priority} onChange={(e) => setPriority(e.target.value)} placeholder="1" />
+              <Label className="flex items-center gap-2">
+                <BadgePercent className="h-4 w-4 text-muted-foreground" />
+                Priority
+              </Label>
+              <Input
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                placeholder="1"
+                className="rounded-xl"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label>Mandatory</Label>
+              <Label className="flex items-center gap-2">
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+                Mandatory
+              </Label>
               <Select value={mandatory} onValueChange={setMandatory}>
-                <SelectTrigger>
+                <SelectTrigger className="rounded-xl">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -128,11 +172,12 @@ export default function BillFormDialog({
             </div>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="secondary" onClick={() => setOpen(false)} className="rounded-xl">
               Cancel
             </Button>
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving} className="gap-2 rounded-xl">
+              <Save className="h-4 w-4" />
               {saving ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
