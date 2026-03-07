@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import ThemeToggle from "@/components/layout/ThemeToggle"
 
 function linkClass({ isActive }) {
   return [
@@ -108,27 +109,34 @@ export default function AppLayout() {
             </div>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-2">
-                <Avatar className="h-8 w-8">
-                  {user?.avatar ? <AvatarImage src={user.avatar} alt="avatar" /> : null}
-                  <AvatarFallback>{initials}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate("/app/profile")}>Profile</DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  logout()
-                  navigate("/login", { replace: true })
-                }}
-              >
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="px-2">
+                  <Avatar className="h-8 w-8">
+                    {user?.avatar ? <AvatarImage src={user.avatar} alt="avatar" /> : null}
+                    <AvatarFallback>{initials}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => navigate("/app/profile")}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    logout()
+                    navigate("/login", { replace: true })
+                  }}
+                >
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </header>
 
         <main className="p-3 sm:p-6">
