@@ -4,7 +4,7 @@ import { useAuth } from "@/auth/useAuth"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -112,6 +112,7 @@ export default function AppLayout() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="px-2">
                 <Avatar className="h-8 w-8">
+                  {user?.avatar ? <AvatarImage src={user.avatar} alt="avatar" /> : null}
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
               </Button>

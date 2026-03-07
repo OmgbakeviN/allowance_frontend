@@ -16,6 +16,7 @@ import StudentWalletPage from "@/features/wallet/StudentWalletPage"
 import BudgetPlansPage from "@/features/budgeting/BudgetPlansPage"
 import PlanDetailPage from "@/features/budgeting/PlanDetailPage"
 import RegisterPage from "./pages/RegisterPage"
+import ProfilePage from "@/features/profile/ProfilePage"
 
 function RoleRedirect() {
   return <div className="p-6">Choisis un menu.</div>
@@ -35,7 +36,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppLayout />}>
             <Route index element={<RoleRedirect />} />
-            <Route path="profile" element={<Page title="Profile (next)" />} />
+            <Route path="profile" element={<ProfilePage />} />
 
             <Route element={<RoleRoute allow={["STUDENT", "ADMIN"]} />}>
               <Route path="student/dashboard" element={<StudentDashboardPage />} />
