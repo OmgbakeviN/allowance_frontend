@@ -10,11 +10,69 @@ import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  CircleDollarSign,
+  Landmark,
+  PiggyBank,
+  Receipt,
+  Save,
+  Settings2,
+  Wallet,
+} from "lucide-react"
 
 function fmt(dt) {
   if (!dt) return "-"
   const d = new Date(dt)
   return Number.isNaN(d.getTime()) ? dt : d.toLocaleString("fr-FR")
+}
+
+function BucketBadge({ value }) {
+  const styles = {
+    DAILY: "bg-[#34E3CC]/10 text-[#0f766e] border-[#34E3CC]/30 dark:text-[#7ef3e0]",
+    BILLS: "bg-[#4F9DFF]/10 text-[#1d4ed8] border-[#4F9DFF]/30 dark:text-[#93c5fd]",
+    SAVINGS: "bg-[#7C5ADE]/10 text-[#6d28d9] border-[#7C5ADE]/30 dark:text-[#c4b5fd]",
+  }
+
+  return (
+    <Badge variant="outline" className={`rounded-full ${styles[value] || ""}`}>
+      {value}
+    </Badge>
+  )
+}
+
+function DirectionBadge({ value }) {
+  const isIn = value === "IN"
+  return (
+    <Badge
+      variant="outline"
+      className={`rounded-full ${
+        isIn
+          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+          : "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300"
+      }`}
+    >
+      <span className="mr-1 inline-flex">
+        {isIn ? <ArrowDownLeft className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5" />}
+      </span>
+      {value}
+    </Badge>
+  )
+}
+
+function StatCard({ icon: Icon, title, value }) {
+  return (
+    <div className="rounded-2xl border p-4 shadow-sm">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm font-medium text-muted-foreground">{title}</div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#34E3CC]/20 via-[#4F9DFF]/20 to-[#7C5ADE]/20">
+          <Icon className="h-5 w-5 text-foreground" />
+        </div>
+      </div>
+      <div className="text-xl font-semibold">{value}</div>
+    </div>
+  )
 }
 
 export default function StudentWalletPage() {
@@ -77,82 +135,101 @@ export default function StudentWalletPage() {
     }
   }
 
-  if (loading && !wallet) return <Skeleton className="h-40 w-full" />
+  if (loading && !wallet) return <Skeleton className="h-40 w-full rounded-2xl" />
 
   const cur = wallet?.currency || currency || "XAF"
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle>Wallet</CardTitle>
-            <CardDescription>Balances, settings, and transactions</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Wallet className="h-5 w-5" />
+              Wallet
+            </CardTitle>
+            <CardDescription>Balances, settings and transaction history</CardDescription>
           </div>
-          <Badge variant="outline">{cur}</Badge>
+          <Badge variant="outline" className="w-fit rounded-full px-3 py-1">
+            {cur}
+          </Badge>
         </CardHeader>
-
-        <CardContent>
-          {error ? (
-            <Alert className="mb-3">
-              <AlertDescription className="text-destructive">{error}</AlertDescription>
-            </Alert>
-          ) : null}
-
-          {info ? (
-            <Alert className="mb-3">
-              <AlertDescription>{info}</AlertDescription>
-            </Alert>
-          ) : null}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="rounded-md border p-3">
-              <div className="text-sm text-muted-foreground">DAILY</div>
-              <div className="text-xl font-semibold">{money(getBal("DAILY"), cur)}</div>
-            </div>
-            <div className="rounded-md border p-3">
-              <div className="text-sm text-muted-foreground">SAVINGS</div>
-              <div className="text-xl font-semibold">{money(getBal("SAVINGS"), cur)}</div>
-            </div>
-            <div className="rounded-md border p-3">
-              <div className="text-sm text-muted-foreground">BILLS</div>
-              <div className="text-xl font-semibold">{money(getBal("BILLS"), cur)}</div>
-            </div>
-          </div>
-        </CardContent>
       </Card>
 
-      <Card>
+      {error ? (
+        <Alert className="rounded-2xl">
+          <AlertDescription className="text-destructive">{error}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      {info ? (
+        <Alert className="rounded-2xl">
+          <AlertDescription>{info}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <StatCard icon={Wallet} title="DAILY" value={money(getBal("DAILY"), cur)} />
+        <StatCard icon={PiggyBank} title="SAVINGS" value={money(getBal("SAVINGS"), cur)} />
+        <StatCard icon={Receipt} title="BILLS" value={money(getBal("BILLS"), cur)} />
+      </div>
+
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Settings</CardTitle>
-          <CardDescription>Currency + daily spending limit (0 = no limit)</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5" />
+            Settings
+          </CardTitle>
+          <CardDescription>Currency and daily spending limit</CardDescription>
         </CardHeader>
+
         <CardContent>
-          <form onSubmit={onSave} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+          <form onSubmit={onSave} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
             <div className="space-y-2">
-              <Label>Currency</Label>
-              <Input value={currency} onChange={(e) => setCurrency(e.target.value)} placeholder="XAF" />
+              <Label className="flex items-center gap-2">
+                <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+                Currency
+              </Label>
+              <Input
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                placeholder="XAF"
+                className="rounded-xl"
+              />
             </div>
+
             <div className="space-y-2">
-              <Label>Daily limit</Label>
+              <Label className="flex items-center gap-2">
+                <Wallet className="h-4 w-4 text-muted-foreground" />
+                Daily limit
+              </Label>
               <Input
                 value={dailyLimit}
                 onChange={(e) => setDailyLimit(e.target.value)}
                 placeholder="2000"
+                className="rounded-xl"
               />
             </div>
-            <Button type="submit" disabled={saving}>
+
+            <Button type="submit" disabled={saving} className="gap-2 rounded-xl">
+              <Save className="h-4 w-4" />
               {saving ? "Saving..." : "Save"}
             </Button>
           </form>
+
+          <p className="mt-3 text-xs text-muted-foreground">0 means no daily limit.</p>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Transactions</CardTitle>
-          <CardDescription>Ledger (latest first)</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Landmark className="h-5 w-5" />
+            Transactions
+          </CardTitle>
+          <CardDescription>Ledger history, latest first</CardDescription>
         </CardHeader>
+
         <CardContent className="overflow-x-auto space-y-3">
           <Table>
             <TableHeader>
@@ -165,17 +242,22 @@ export default function StudentWalletPage() {
                 <TableHead className="text-right">Amount</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {visibleTxns.map((t) => (
                 <TableRow key={t.id}>
                   <TableCell className="text-muted-foreground">{fmt(t.created_at)}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{t.bucket_type}</Badge>
+                    <BucketBadge value={t.bucket_type} />
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{t.txn_type}</Badge>
+                    <Badge variant="secondary" className="rounded-full">
+                      {t.txn_type}
+                    </Badge>
                   </TableCell>
-                  <TableCell>{t.direction}</TableCell>
+                  <TableCell>
+                    <DirectionBadge value={t.direction} />
+                  </TableCell>
                   <TableCell className="max-w-[260px] truncate">{t.description || "-"}</TableCell>
                   <TableCell className="text-right font-medium">{money(t.amount, cur)}</TableCell>
                 </TableRow>
@@ -193,7 +275,7 @@ export default function StudentWalletPage() {
 
           {txns.length > limit ? (
             <div className="flex justify-center">
-              <Button variant="secondary" onClick={() => setLimit((v) => v + 30)}>
+              <Button variant="secondary" onClick={() => setLimit((v) => v + 30)} className="rounded-xl">
                 Load more
               </Button>
             </div>

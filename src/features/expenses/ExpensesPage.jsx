@@ -13,11 +13,76 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  AlertTriangle,
+  CalendarDays,
+  CircleDollarSign,
+  Filter,
+  Receipt,
+  Tag,
+  TrendingUp,
+  Wallet,
+} from "lucide-react"
 
 function fmt(dt) {
   if (!dt) return "-"
   const d = new Date(dt)
   return Number.isNaN(d.getTime()) ? dt : d.toLocaleString("fr-FR")
+}
+
+function StatCard({ icon: Icon, title, value, subtitle }) {
+  return (
+    <Card className="overflow-hidden shadow-sm">
+      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
+        <div className="space-y-1">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          <CardDescription className="text-xs">{subtitle}</CardDescription>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#34E3CC]/20 via-[#4F9DFF]/20 to-[#7C5ADE]/20">
+          <Icon className="h-5 w-5 text-foreground" />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-semibold tracking-tight">{value}</div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function AlertsRow({ alerts = [] }) {
+  if (!alerts.length) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+        <AlertTriangle className="h-4 w-4" />
+        <span>No alerts</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {alerts.map((a, idx) => (
+        <Badge key={idx} variant="secondary" className="gap-1 rounded-full px-3 py-1">
+          <AlertTriangle className="h-3.5 w-3.5" />
+          {a.type}
+        </Badge>
+      ))}
+    </div>
+  )
+}
+
+function BucketBadge({ value }) {
+  const styles = {
+    DAILY: "bg-[#34E3CC]/10 text-[#0f766e] border-[#34E3CC]/30 dark:text-[#7ef3e0]",
+    BILLS: "bg-[#4F9DFF]/10 text-[#1d4ed8] border-[#4F9DFF]/30 dark:text-[#93c5fd]",
+    SAVINGS: "bg-[#7C5ADE]/10 text-[#6d28d9] border-[#7C5ADE]/30 dark:text-[#c4b5fd]",
+  }
+
+  return (
+    <Badge variant="outline" className={`rounded-full ${styles[value] || ""}`}>
+      {value}
+    </Badge>
+  )
 }
 
 export default function ExpensesPage() {
@@ -34,14 +99,17 @@ export default function ExpensesPage() {
   const [categoryId, setCategoryId] = useState("")
   const [bucketType, setBucketType] = useState("")
 
+  const normalizedCategoryId = categoryId === "__all__" ? "" : categoryId
+  const normalizedBucketType = bucketType === "__all__" ? "" : bucketType
+
   const params = useMemo(() => {
     const p = {}
     if (dateFrom) p.date_from = dateFrom
     if (dateTo) p.date_to = dateTo
-    if (categoryId) p.category_id = categoryId
-    if (bucketType) p.bucket_type = bucketType
+    if (normalizedCategoryId) p.category_id = normalizedCategoryId
+    if (normalizedBucketType) p.bucket_type = normalizedBucketType
     return p
-  }, [dateFrom, dateTo, categoryId, bucketType])
+  }, [dateFrom, dateTo, normalizedCategoryId, normalizedBucketType])
 
   const loadAll = async () => {
     setLoading(true)
@@ -52,14 +120,12 @@ export default function ExpensesPage() {
         getMyExpenseSummary({ date_from: dateFrom || undefined, date_to: dateTo || undefined }),
         getMyExpenses(params),
       ])
+
       setCategories(cats || [])
       setSummary(sum)
       setExpenses(list || [])
 
-      const cur =
-        sum?.wallet?.currency ||
-        list?.[0]?.wallet?.currency ||
-        "XAF"
+      const cur = sum?.wallet?.currency || list?.[0]?.wallet?.currency || "XAF"
       setCurrency(cur)
     } catch (e) {
       setError(e?.response?.data?.detail || "Failed to load expenses.")
@@ -97,62 +163,70 @@ export default function ExpensesPage() {
     setTimeout(() => loadAll(), 0)
   }
 
-  if (loading && !summary) return <Skeleton className="h-40 w-full" />
+  if (loading && !summary) return <Skeleton className="h-40 w-full rounded-2xl" />
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle>Expenses</CardTitle>
-            <CardDescription>Track spending with categories and alerts.</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Receipt className="h-5 w-5" />
+              Expenses
+            </CardTitle>
+            <CardDescription>Track spending, monitor alerts and keep control of your budget.</CardDescription>
           </div>
           <ExpenseCreateDialog onCreated={loadAll} />
         </CardHeader>
+      </Card>
 
+      {error ? (
+        <Alert className="rounded-2xl">
+          <AlertDescription className="text-destructive">{error}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <StatCard
+          icon={CircleDollarSign}
+          title="Total today"
+          subtitle="Today’s spending"
+          value={money(summary?.total_today, currency)}
+        />
+        <StatCard
+          icon={TrendingUp}
+          title="Total week"
+          subtitle="This week"
+          value={money(summary?.total_week, currency)}
+        />
+        <StatCard
+          icon={Wallet}
+          title="Total month"
+          subtitle="This month"
+          value={money(summary?.total_month, currency)}
+        />
+      </div>
+
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
+            Alerts
+          </CardTitle>
+          <CardDescription>Important expense notifications</CardDescription>
+        </CardHeader>
         <CardContent>
-          {error ? (
-            <Alert className="mb-3">
-              <AlertDescription className="text-destructive">{error}</AlertDescription>
-            </Alert>
-          ) : null}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="rounded-md border p-3">
-              <div className="text-sm text-muted-foreground">Total today</div>
-              <div className="text-xl font-semibold">{money(summary?.total_today, currency)}</div>
-            </div>
-            <div className="rounded-md border p-3">
-              <div className="text-sm text-muted-foreground">Total week</div>
-              <div className="text-xl font-semibold">{money(summary?.total_week, currency)}</div>
-            </div>
-            <div className="rounded-md border p-3">
-              <div className="text-sm text-muted-foreground">Total month</div>
-              <div className="text-xl font-semibold">{money(summary?.total_month, currency)}</div>
-            </div>
-          </div>
-
-          <div className="mt-3">
-            <div className="text-sm font-medium mb-2">Alerts</div>
-            <div className="flex flex-wrap gap-2">
-              {(summary?.alerts || []).length ? (
-                summary.alerts.map((a, idx) => (
-                  <Badge key={idx} variant="secondary">
-                    {a.type}
-                  </Badge>
-                ))
-              ) : (
-                <div className="text-sm text-muted-foreground">No alerts</div>
-              )}
-            </div>
-          </div>
+          <AlertsRow alerts={summary?.alerts || []} />
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Top categories</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5" />
+              Top categories
+            </CardTitle>
             <CardDescription>Top 5 by total amount</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
@@ -166,7 +240,7 @@ export default function ExpensesPage() {
               <TableBody>
                 {(summary?.top_categories || []).map((c, idx) => (
                   <TableRow key={idx}>
-                    <TableCell>{c["category__name"]}</TableCell>
+                    <TableCell className="font-medium">{c["category__name"]}</TableCell>
                     <TableCell className="text-right">{money(c.total, currency)}</TableCell>
                   </TableRow>
                 ))}
@@ -182,28 +256,42 @@ export default function ExpensesPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Filters</CardTitle>
-            <CardDescription>Filter list by period/category/bucket</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            <CardDescription>Filter by period, category and bucket</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Date from</Label>
-                <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+                <Label className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  Date from
+                </Label>
+                <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-xl" />
               </div>
+
               <div className="space-y-2">
-                <Label>Date to</Label>
-                <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+                <Label className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  Date to
+                </Label>
+                <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="rounded-xl" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Category</Label>
+                <Label className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-muted-foreground" />
+                  Category
+                </Label>
                 <Select value={categoryId} onValueChange={setCategoryId}>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -218,9 +306,12 @@ export default function ExpensesPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Bucket</Label>
+                <Label className="flex items-center gap-2">
+                  <Wallet className="h-4 w-4 text-muted-foreground" />
+                  Bucket
+                </Label>
                 <Select value={bucketType} onValueChange={setBucketType}>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="All buckets" />
                   </SelectTrigger>
                   <SelectContent>
@@ -234,17 +325,11 @@ export default function ExpensesPage() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button
-                onClick={() => {
-                  if (categoryId === "__all__") setCategoryId("")
-                  if (bucketType === "__all__") setBucketType("")
-                  setTimeout(() => applyFilters(), 0)
-                }}
-                variant="secondary"
-              >
+              <Button onClick={applyFilters} variant="secondary" className="gap-2 rounded-xl">
+                <Filter className="h-4 w-4" />
                 Apply
               </Button>
-              <Button onClick={resetFilters} variant="outline">
+              <Button onClick={resetFilters} variant="outline" className="rounded-xl">
                 Reset
               </Button>
             </div>
@@ -252,11 +337,15 @@ export default function ExpensesPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Expenses list</CardTitle>
-          <CardDescription>Latest expenses</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Receipt className="h-5 w-5" />
+            Expenses list
+          </CardTitle>
+          <CardDescription>Latest recorded expenses</CardDescription>
         </CardHeader>
+
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -269,20 +358,21 @@ export default function ExpensesPage() {
                 <TableHead className="text-right">Receipt</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {expenses.map((e) => (
                 <TableRow key={e.id}>
                   <TableCell className="text-muted-foreground">{fmt(e.occurred_at)}</TableCell>
-                  <TableCell>{e.category?.name}</TableCell>
+                  <TableCell className="font-medium">{e.category?.name}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{e.bucket_type}</Badge>
+                    <BucketBadge value={e.bucket_type} />
                   </TableCell>
                   <TableCell className="max-w-[260px] truncate">{e.note || "-"}</TableCell>
                   <TableCell className="text-right font-medium">{money(e.amount, currency)}</TableCell>
                   <TableCell className="text-right">
                     {e.receipt ? (
                       <a
-                        className="underline underline-offset-4"
+                        className="inline-flex items-center gap-1 underline underline-offset-4"
                         href={e.receipt}
                         target="_blank"
                         rel="noreferrer"

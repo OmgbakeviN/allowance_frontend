@@ -6,10 +6,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  ArrowDownCircle,
+  CheckCircle2,
+  CreditCard,
+  Landmark,
+  Receipt,
+  Wallet,
+} from "lucide-react"
 
 export default function TopUpDialog({ currency = "XAF", onDone }) {
   const [open, setOpen] = useState(false)
@@ -56,19 +71,33 @@ export default function TopUpDialog({ currency = "XAF", onDone }) {
   const txn = result?.transaction
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset() }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v)
+        if (!v) reset()
+      }}
+    >
       <DialogTrigger asChild>
-        <Button>Top up (simulation)</Button>
+        <Button className="gap-2 rounded-xl">
+          <ArrowDownCircle className="h-4 w-4" />
+          Top up
+        </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg rounded-2xl">
         <DialogHeader>
-          <DialogTitle>Top up</DialogTitle>
-          <DialogDescription>Simulation MTN/Orange Money (fee applied).</DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <Wallet className="h-5 w-5" />
+            Top up balance
+          </DialogTitle>
+          <DialogDescription>
+            Simulation MTN/Orange Money with platform fee applied.
+          </DialogDescription>
         </DialogHeader>
 
         {error ? (
-          <Alert>
+          <Alert className="rounded-2xl">
             <AlertDescription className="text-destructive">{error}</AlertDescription>
           </Alert>
         ) : null}
@@ -76,15 +105,29 @@ export default function TopUpDialog({ currency = "XAF", onDone }) {
         {!result ? (
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
-              <Label>Amount</Label>
-              <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="20000" required />
+              <Label className="flex items-center gap-2">
+                <Wallet className="h-4 w-4 text-muted-foreground" />
+                Amount
+              </Label>
+              <Input
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="20000"
+                required
+                className="rounded-xl"
+              />
               <div className="text-xs text-muted-foreground">Currency: {currency}</div>
             </div>
 
             <div className="space-y-2">
-              <Label>Provider</Label>
+              <Label className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                Provider
+              </Label>
               <Select value={provider} onValueChange={setProvider}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="MTN">MTN Money</SelectItem>
                   <SelectItem value="ORANGE">Orange Money</SelectItem>
@@ -93,35 +136,76 @@ export default function TopUpDialog({ currency = "XAF", onDone }) {
             </div>
 
             <div className="space-y-2">
-              <Label>External ref (optional)</Label>
-              <Input value={externalRef} onChange={(e) => setExternalRef(e.target.value)} placeholder="TOPUP-001" />
+              <Label className="flex items-center gap-2">
+                <Landmark className="h-4 w-4 text-muted-foreground" />
+                External ref
+              </Label>
+              <Input
+                value={externalRef}
+                onChange={(e) => setExternalRef(e.target.value)}
+                placeholder="TOPUP-001"
+                className="rounded-xl"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label>Description (optional)</Label>
-              <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="My topup" />
+              <Label className="flex items-center gap-2">
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+                Description
+              </Label>
+              <Input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="My top up"
+                className="rounded-xl"
+              />
             </div>
 
-            <DialogFooter>
-              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={loading}>{loading ? "..." : "Top up"}</Button>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="secondary" onClick={() => setOpen(false)} className="rounded-xl">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading} className="gap-2 rounded-xl">
+                <ArrowDownCircle className="h-4 w-4" />
+                {loading ? "Processing..." : "Top up"}
+              </Button>
             </DialogFooter>
           </form>
         ) : (
-          <div className="space-y-3">
-            <Alert>
-              <AlertDescription>✅ Top up done.</AlertDescription>
+          <div className="space-y-4">
+            <Alert className="rounded-2xl">
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertDescription>Top up completed successfully.</AlertDescription>
             </Alert>
 
-            <div className="rounded-md border p-3 text-sm space-y-1">
-              <div className="flex justify-between"><span className="text-muted-foreground">Gross</span><span className="font-medium">{money(txn.gross_amount, currency)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Fee</span><span className="font-medium">{money(txn.fee_amount, currency)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Net credited</span><span className="font-medium">{money(txn.net_amount, currency)}</span></div>
+            <div className="space-y-3 rounded-2xl border p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Provider</span>
+                <Badge variant="secondary" className="rounded-full">
+                  {provider}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Gross</span>
+                <span className="font-medium">{money(txn.gross_amount, currency)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Fee</span>
+                <span className="font-medium">{money(txn.fee_amount, currency)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Net credited</span>
+                <span className="font-semibold">{money(txn.net_amount, currency)}</span>
+              </div>
             </div>
 
-            <DialogFooter>
-              <Button variant="secondary" onClick={() => setOpen(false)}>Close</Button>
-              <Button onClick={() => setResult(null)}>New top up</Button>
+            <DialogFooter className="gap-2">
+              <Button variant="secondary" onClick={() => setOpen(false)} className="rounded-xl">
+                Close
+              </Button>
+              <Button onClick={() => setResult(null)} className="rounded-xl">
+                New top up
+              </Button>
             </DialogFooter>
           </div>
         )}

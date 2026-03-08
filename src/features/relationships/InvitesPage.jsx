@@ -10,6 +10,14 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Copy,
+  Mail,
+  PlusCircle,
+  ShieldCheck,
+  Ticket,
+  Users,
+} from "lucide-react"
 
 function fmt(dt) {
   if (!dt) return "-"
@@ -71,53 +79,72 @@ export default function InvitesPage() {
     }
   }
 
-  if (loading) return <Skeleton className="h-40 w-full" />
+  if (loading) return <Skeleton className="h-40 w-full rounded-2xl" />
 
   return (
-    <div className="space-y-4">
-      <Card>
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
         <CardHeader>
-          <CardTitle>Invites</CardTitle>
-          <CardDescription>Create an invite code for a student to link.</CardDescription>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Ticket className="h-5 w-5" />
+            Invites
+          </CardTitle>
+          <CardDescription>Create codes to link students to your account.</CardDescription>
+        </CardHeader>
+      </Card>
+
+      {error ? (
+        <Alert className="rounded-2xl">
+          <AlertDescription className="text-destructive">{error}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      {info ? (
+        <Alert className="rounded-2xl">
+          <AlertDescription>{info}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <PlusCircle className="h-5 w-5" />
+            Create invite
+          </CardTitle>
+          <CardDescription>Generate a new student invite code.</CardDescription>
         </CardHeader>
         <CardContent>
-          {error ? (
-            <Alert className="mb-3">
-              <AlertDescription className="text-destructive">{error}</AlertDescription>
-            </Alert>
-          ) : null}
-
-          {info ? (
-            <Alert className="mb-3">
-              <AlertDescription>{info}</AlertDescription>
-            </Alert>
-          ) : null}
-
           <form onSubmit={onCreate} className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-end">
             <div className="space-y-2">
-              <Label htmlFor="email">Student email (optional)</Label>
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                Student email
+              </Label>
               <Input
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="student@email.com"
+                className="rounded-xl"
               />
               <div className="text-xs text-muted-foreground">
-                If provided, it’s stored as a hint. The code is what matters.
+                Optional. Stored as a hint only.
               </div>
             </div>
-            <Button type="submit" disabled={creating}>
+            <Button type="submit" disabled={creating} className="gap-2 rounded-xl">
+              <PlusCircle className="h-4 w-4" />
               {creating ? "Creating..." : "Create invite"}
             </Button>
           </form>
 
           {createdCode ? (
-            <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 rounded-md border p-3">
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border p-4 shadow-sm">
               <div className="flex-1">
                 <div className="text-sm text-muted-foreground">New invite code</div>
-                <div className="text-xl font-semibold tracking-wider">{createdCode}</div>
+                <div className="text-2xl font-semibold tracking-[0.2em]">{createdCode}</div>
               </div>
-              <Button variant="secondary" onClick={() => copy(createdCode)}>
+              <Button variant="secondary" onClick={() => copy(createdCode)} className="gap-2 rounded-xl">
+                <Copy className="h-4 w-4" />
                 Copy
               </Button>
             </div>
@@ -125,11 +152,20 @@ export default function InvitesPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>My invites</CardTitle>
-          <CardDescription>History of created invite codes.</CardDescription>
+      <Card className="shadow-sm">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              My invites
+            </CardTitle>
+            <CardDescription>History of generated codes</CardDescription>
+          </div>
+          <Badge variant="outline" className="w-fit rounded-full px-3 py-1">
+            {rows.length} total
+          </Badge>
         </CardHeader>
+
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -147,13 +183,20 @@ export default function InvitesPage() {
                 <TableRow key={r.code}>
                   <TableCell className="font-mono font-semibold">{r.code}</TableCell>
                   <TableCell>
-                    <Badge variant={r.status === "PENDING" ? "default" : "secondary"}>{r.status}</Badge>
+                    <Badge
+                      variant={r.status === "PENDING" ? "default" : "secondary"}
+                      className="rounded-full"
+                    >
+                      {r.status === "PENDING" ? <ShieldCheck className="mr-1 h-3.5 w-3.5" /> : null}
+                      {r.status}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{fmt(r.expires_at)}</TableCell>
                   <TableCell className="text-muted-foreground">{r.student_email || "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{fmt(r.created_at)}</TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" variant="outline" onClick={() => copy(r.code)}>
+                    <Button size="sm" variant="outline" onClick={() => copy(r.code)} className="gap-2 rounded-xl">
+                      <Copy className="h-4 w-4" />
                       Copy
                     </Button>
                   </TableCell>

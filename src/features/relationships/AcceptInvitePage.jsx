@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { CheckCircle2, KeyRound, Link2, Undo2 } from "lucide-react"
 
 export default function AcceptInvitePage() {
   const navigate = useNavigate()
@@ -37,55 +38,68 @@ export default function AcceptInvitePage() {
   }
 
   return (
-    <div className="max-w-xl">
-      <Card>
+    <div className="max-w-xl space-y-6">
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
         <CardHeader>
-          <CardTitle>Lier mon parent</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Link2 className="h-5 w-5" />
+            Link my parent
+          </CardTitle>
           <CardDescription>
-            Entre le code d’invitation reçu du parent pour connecter vos comptes.
+            Enter the invite code received from the parent to connect your accounts.
           </CardDescription>
         </CardHeader>
+      </Card>
 
-        <CardContent>
+      <Card className="shadow-sm">
+        <CardContent className="pt-6">
           {error ? (
-            <Alert className="mb-4">
+            <Alert className="mb-4 rounded-2xl">
               <AlertDescription className="text-destructive">{error}</AlertDescription>
             </Alert>
           ) : null}
 
           {success ? (
-            <Alert className="mb-4">
+            <Alert className="mb-4 rounded-2xl">
+              <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
-                ✅ Parent lié : <b>{success.parent?.username}</b> ({success.parent?.email || "—"})
+                Parent linked: <b>{success.parent?.username}</b> ({success.parent?.email || "—"})
               </AlertDescription>
             </Alert>
           ) : null}
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="code">Code d’invitation</Label>
+              <Label htmlFor="code" className="flex items-center gap-2">
+                <KeyRound className="h-4 w-4 text-muted-foreground" />
+                Invite code
+              </Label>
               <Input
                 id="code"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="EX: A1B2C3D4E5"
                 required
+                className="rounded-xl tracking-[0.2em] uppercase"
               />
               <div className="text-xs text-muted-foreground">
-                Astuce : colle le code exactement comme reçu (10 caractères).
+                Tip: paste the code exactly as received.
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Validation..." : "Valider"}
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" disabled={loading} className="gap-2 rounded-xl">
+                <Link2 className="h-4 w-4" />
+                {loading ? "Validating..." : "Validate"}
               </Button>
               <Button
                 type="button"
                 variant="secondary"
                 onClick={() => navigate("/app/student/dashboard")}
+                className="gap-2 rounded-xl"
               >
-                Retour dashboard
+                <Undo2 className="h-4 w-4" />
+                Back to dashboard
               </Button>
             </div>
           </form>

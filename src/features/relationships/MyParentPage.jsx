@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ArrowRight, CalendarDays, Link2, Shield, UserRound } from "lucide-react"
 
 function fmt(dt) {
   if (!dt) return "-"
@@ -45,13 +46,13 @@ export default function MyParentPage() {
     return () => (mounted = false)
   }, [])
 
-  if (loading) return <Skeleton className="h-40 w-full" />
+  if (loading) return <Skeleton className="h-40 w-full rounded-2xl" />
 
   if (error) {
     return (
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Mon Parent</CardTitle>
+          <CardTitle>My parent</CardTitle>
           <CardDescription className="text-destructive">{error}</CardDescription>
         </CardHeader>
       </Card>
@@ -60,19 +61,28 @@ export default function MyParentPage() {
 
   if (notLinked) {
     return (
-      <div className="max-w-xl space-y-4">
-        <Card>
+      <div className="max-w-2xl space-y-4">
+        <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
           <CardHeader>
-            <CardTitle>Mon Parent</CardTitle>
-            <CardDescription>Ton compte n’est pas encore lié à un parent.</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Link2 className="h-5 w-5" />
+              My parent
+            </CardTitle>
+            <CardDescription>Your account is not linked yet.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Alert>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="pt-6 space-y-4">
+            <Alert className="rounded-2xl">
               <AlertDescription>
-                Demande au parent de générer un code d’invitation, puis valide-le ici.
+                Ask the parent to generate an invite code, then validate it here.
               </AlertDescription>
             </Alert>
-            <Button onClick={() => navigate("/app/student/link-parent")}>Lier mon parent</Button>
+            <Button onClick={() => navigate("/app/student/link-parent")} className="gap-2 rounded-xl">
+              <ArrowRight className="h-4 w-4" />
+              Link my parent
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -83,36 +93,51 @@ export default function MyParentPage() {
   const status = data?.status
 
   return (
-    <div className="max-w-xl space-y-4">
-      <Card>
+    <div className="max-w-2xl space-y-6">
+      <Card className="overflow-hidden border-0 bg-gradient-to-r from-[#34E3CC]/15 via-[#4F9DFF]/10 to-[#7C5ADE]/15 shadow-sm">
         <CardHeader>
-          <CardTitle>Mon Parent</CardTitle>
-          <CardDescription>Informations du parent lié à ton compte.</CardDescription>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <UserRound className="h-5 w-5" />
+            My parent
+          </CardTitle>
+          <CardDescription>Information about the linked parent account.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+      </Card>
+
+      <Card className="shadow-sm">
+        <CardContent className="pt-6 space-y-5">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="font-semibold truncate">{parent?.username}</div>
+              <div className="text-lg font-semibold truncate">{parent?.username}</div>
               <div className="text-sm text-muted-foreground truncate">{parent?.email || "-"}</div>
             </div>
-            <Badge variant={status === "ACTIVE" ? "default" : "secondary"}>{status}</Badge>
+            <Badge variant={status === "ACTIVE" ? "default" : "secondary"} className="rounded-full px-3 py-1">
+              <Shield className="mr-1 h-3.5 w-3.5" />
+              {status}
+            </Badge>
           </div>
 
-          <div className="text-sm text-muted-foreground">
-            Lié depuis : <span className="text-foreground">{fmt(data?.created_at)}</span>
+          <div className="rounded-2xl border p-4 shadow-sm">
+            <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+              <CalendarDays className="h-4 w-4" />
+              Linked since
+            </div>
+            <div className="font-medium">{fmt(data?.created_at)}</div>
           </div>
 
-          <Alert>
+          <Alert className="rounded-2xl">
             <AlertDescription>
-              Pour changer de parent, le parent actuel doit d’abord révoquer le lien, puis tu acceptes un nouveau code.
+              To change parent, the current link must be revoked first, then you can accept a new code.
             </AlertDescription>
           </Alert>
 
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => navigate("/app/student/link-parent")}>
-              Entrer un code (si lien révoqué)
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" onClick={() => navigate("/app/student/link-parent")} className="rounded-xl">
+              Enter a new code
             </Button>
-            <Button onClick={() => navigate("/app/student/dashboard")}>Retour dashboard</Button>
+            <Button onClick={() => navigate("/app/student/dashboard")} className="rounded-xl">
+              Back to dashboard
+            </Button>
           </div>
         </CardContent>
       </Card>
