@@ -30,7 +30,7 @@ function Card({ className, children, ...props }) {
         src="/lines.svg"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-0 z-0 h-full max-w-none object-contain opacity-[0.4] [mask-image:linear-gradient(to_left,black,transparent)]"
+        className="pointer-events-none absolute right-0 top-0 z-0 h-full max-w-none object-contain opacity-[0.2] [mask-image:linear-gradient(to_left,black,transparent)]"
       />
 
       {/* Contenu principal (passe au-dessus des décors) */}
