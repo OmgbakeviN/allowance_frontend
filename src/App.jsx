@@ -17,6 +17,7 @@ import BudgetPlansPage from "@/features/budgeting/BudgetPlansPage"
 import PlanDetailPage from "@/features/budgeting/PlanDetailPage"
 import RegisterPage from "./pages/RegisterPage"
 import ProfilePage from "@/features/profile/ProfilePage"
+import LandingPage from "@/pages/LandingPage"
 
 function RoleRedirect() {
   return <div className="p-6">Choisis un menu.</div>
@@ -58,8 +59,8 @@ export default function App() {
           </Route>
         </Route>
 
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
