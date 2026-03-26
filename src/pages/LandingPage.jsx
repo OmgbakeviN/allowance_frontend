@@ -260,24 +260,30 @@ export default function LandingPage() {
                         </div>
 
                         <div className="mt-5 rounded-[1.5rem] border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground">
-                          DROP YOUR MAIN APP SCREENSHOT HERE
+                          <img
+                            src="public\images\dashboard.png"
+                            alt="Budggio dashboard"
+                            className="h-full w-full rounded-[1.5rem] object-cover"
+                          />
                         </div>
                       </div>
 
                       <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
-                        <div
-                          className="rounded-[1.5rem] border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground"
-                          style={{ transform: "translateZ(38px)" }}
-                        >
-                          STUDENT IMAGE PLACEHOLDER
-                        </div>
+                        
+                          <img
+                            src="public\images\student.png"
+                            alt="Budggio dashboard"
+                            className="h-full w-full rounded-[1.5rem] object-cover"
+                          />
+                        
 
-                        <div
-                          className="rounded-[1.5rem] border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground"
-                          style={{ transform: "translateZ(48px)" }}
-                        >
-                          PARENT IMAGE PLACEHOLDER
-                        </div>
+                        
+                          <img
+                            src="public\images\parent.png"
+                            alt="Budggio dashboard"
+                            className="h-full w-full rounded-[1.5rem] object-cover"
+                          />
+                        
                       </div>
                     </div>
                   </div>
@@ -415,7 +421,11 @@ export default function LandingPage() {
                   ))}
 
                   <div className="rounded-[1.5rem] border border-dashed bg-muted/30 p-8 text-center text-sm text-muted-foreground">
-                    ADD STUDENT SCREENSHOT OR PHOTO HERE
+                    <img
+                      src="public\images\student-happy.png"
+                      alt="Budggio dashboard"
+                      className="h-full w-full rounded-[1.5rem] object-cover"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -446,7 +456,11 @@ export default function LandingPage() {
                   ))}
 
                   <div className="rounded-[1.5rem] border border-dashed bg-muted/30 p-8 text-center text-sm text-muted-foreground">
-                    ADD PARENT SCREENSHOT OR PHOTO HERE
+                    <img
+                      src="public\images\parent-happy.png"
+                      alt="Budggio dashboard"
+                      className="h-full w-full rounded-[1.5rem] object-cover"
+                    />
                   </div>
                 </CardContent>
               </Card>
